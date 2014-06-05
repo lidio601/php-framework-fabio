@@ -2,6 +2,22 @@
 
 define('LABEL_NEW',' - richiesto - ');
 
+function detect_mobile() {
+	// https://developer.mozilla.org/en-US/docs/Mobile/Viewport_meta_tag
+	return isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/(alcatel|amoi|android|avantgo|blackberry|benq|cell|cricket|docomo|elaine|htc|iemobile|iphone|ipad|ipaq|ipod|j2me|java|midp|mini|mmp|mobi|motorola|nec-|nokia|palm|panasonic|philips|phone|playbook|sagem|sharp|sie-|silk|smartphone|sony|symbian|t-mobile|telus|up\.browser|up\.link|vodafone|wap|webos|wireless|xda|xoom|zte)/i', $_SERVER['HTTP_USER_AGENT']);
+}
+
+/**
+ * Determine if supplied string is a valid GUID
+ *
+ * @param string $md5 String to validate
+ * @return boolean
+ */
+function isValidMd5($md5)
+{
+    return !empty($md5) && preg_match('/^[a-f0-9]{32}$/', $md5);
+}
+
 /*
  *	function varGET ( $name , [$default] ) : string
  *	prende la variabile con nome $name dall'array $_GET
@@ -459,17 +475,49 @@ function bindObjtoQuery($db,$table,$tobind,$exec=false,$id=0) {
  *	@param append_one_blank	Boolean, devo includere un record vuoto in fondo alla lista dei record esistenti?
  */
 function sqltoXML($dbo) {
-
 	$rows = $dbo->loadObjectList();
 	if( !count($rows) && DEBUG ) {
 		notifyXML(404,$dbo->getErrorMsg()."<br />\n".$dbo->getQuery());
 	}
+	return oltoXML($rows);
+}
+
+function oltoXML($rows,$field_to_jump=array()) {
 	$ris  = "";
 	$ris .= "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 	$ris .= "<rows stat=\"OK\">\n";
 	for($i=0;$i<count($rows);$i++) {
 		$ris .= "\t<row ";
-		foreach($rows[$i] as $k=>$v) {
+		if(is_array($rows[$i]) || is_object($rows[$i])) {
+			foreach($rows[$i] as $k=>$v) {
+				if( is_array($field_to_jump) && in_array($k,$field_to_jump) ) {
+					continue;
+				}
+				//$ris .= $k."=\"".htmlentities($v,0,'UTF-8')."\" ";
+				//$ris .= $k."=\"".$v."\" ";
+				$v = str_replace("&","&amp;",$v);
+				//$v = str_replace("'","&#39;",$v);
+				$v = str_replace("\"","'",$v);
+				$ris .= $k."=\"".$v."\" ";
+			}
+		} else {
+			$ris .= "value=\"".strval($rows[$i])."\" ";
+		}
+		$ris .= "/>\n";
+	}
+	$ris .= 	"</rows>\n";
+	return $ris;
+}
+
+function otoXML($row,$field_to_jump=array(),$name="rows") {
+	$ris  = "";
+	$ris .= "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+	$ris .= "<".$name." stat=\"OK\">\n";
+	if(is_array($row) || is_object($row)) {
+		foreach($row as $k=>$v) {
+			if( is_array($field_to_jump) && in_array($k,$field_to_jump) ) {
+				continue;
+			}
 			//$ris .= $k."=\"".htmlentities($v,0,'UTF-8')."\" ";
 			//$ris .= $k."=\"".$v."\" ";
 			$v = str_replace("&","&amp;",$v);
@@ -477,9 +525,10 @@ function sqltoXML($dbo) {
 			$v = str_replace("\"","'",$v);
 			$ris .= $k."=\"".$v."\" ";
 		}
-		$ris .= "/>\n";
+	} else {
+		$ris .= strval($row);
 	}
-	$ris .= 	"</rows>\n";
+	$ris .= 	"</".$name.">\n";
 	return $ris;
 }
 

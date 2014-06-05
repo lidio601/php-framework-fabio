@@ -12,18 +12,20 @@ defined('DIE_ON_DB_ACCESS') or define('DIE_ON_DB_ACCESS',true);
 
 ///////////////////////////////////////////////////////////////////////
 // Prevent any possible XSS attacks via $_GET.
-foreach ($_GET as $check_url) {
-	$check_url = strtolower(strval($check_url));
-    if ((preg_match("<[^\>]*script*\"?[^\>]*>", $check_url)) || (preg_match("<[^\>]*object*\"?[^\>]*>", $check_url)) ||
-        (preg_match("<[^\>]*iframe*\"?[^\>]*>", $check_url)) || (preg_match("<[^\>]*applet*\"?[^\>]*>", $check_url)) ||
-        (preg_match("<[^\>]*meta*\"?[^\>]*>", $check_url)) || (preg_match("<[^\>]*style*\"?[^\>]*>", $check_url)) ||
-        (preg_match("<[^\>]*\<form*\"?[^\>]*>", $check_url)) ) {
-    //if(DEBUG) {
-    	echo "<h1>Due to ".$check_url."</h1>";
-    //}
-    die('Access denied!!!');
-    }
-	unset($check_url);
+if(!defined('JUMP_XSS_CONTROL')) {
+	foreach ($_GET as $check_url) {
+		$check_url = strtolower(strval($check_url));
+	    if ((preg_match("<[^\>]*script*\"?[^\>]*>", $check_url)) || (preg_match("<[^\>]*object*\"?[^\>]*>", $check_url)) ||
+	        (preg_match("<[^\>]*iframe*\"?[^\>]*>", $check_url)) || (preg_match("<[^\>]*applet*\"?[^\>]*>", $check_url)) ||
+	        (preg_match("<[^\>]*meta*\"?[^\>]*>", $check_url)) || (preg_match("<[^\>]*style*\"?[^\>]*>", $check_url)) ||
+	        (preg_match("<[^\>]*\<form*\"?[^\>]*>", $check_url)) ) {
+	    //if(DEBUG) {
+	    	echo "<h1>Due to ".$check_url."</h1>";
+	    //}
+	    die('Access denied!!!');
+	    }
+		unset($check_url);
+	}
 }
 ///////////////////////////////////////////////////////////////////////
 
@@ -46,7 +48,7 @@ function _getDBO($options) {
 	);*/
 	$toRet = &JDatabase::getInstance( $options );
 	if( DIE_ON_DB_ACCESS && !is_object($toRet) )	die($options['user'].'@'.$options['host'].' '.$toRet);
-	if( is_object($toRet) && DEBUG && $toRet->getErrorNum() > 0)	echo 'JDatabase::getInstance: Could not connect to database <br />' . 'joomla.library:'.$toRet->getErrorNum().' - '.$toRet->getErrorMsg();
+	//if( is_object($toRet) && DEBUG && $toRet->getErrorNum() > 0)	echo 'JDatabase::getInstance: Could not connect to database <br />' . 'joomla.library:'.$toRet->getErrorNum().' - '.$toRet->getErrorMsg();
 	return $toRet;
 }
 
