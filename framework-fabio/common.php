@@ -1,5 +1,7 @@
 <?php
 
+defined('BASE_DIR') or define('BASE_DIR','/');
+
 ///////////////////////////////////////////////////////////////////////
 // Configuration
 if(defined('DEBUG') && DEBUG) {
@@ -54,5 +56,18 @@ function _getDBO($options) {
 
 //richiedo le funzioni di servizio
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'function.php');
+
+header( 'Expires: Mon, 26 Mar 1988 08:30:00 GMT' );
+header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+header( 'Cache-Control: post-check=0, pre-check=0', false );
+header( 'Pragma: no-cache' );
+
+///////////////////////////////////////////////////////////////////////
+
+function ffflush() {
+	flush();
+	ob_flush();
+}
 
 ?>
