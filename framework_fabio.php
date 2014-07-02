@@ -11,5 +11,6 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'framework-fabio'.DIRECTORY_S
 require_once('css_packer.php');
 require_once('recaptchalib.php');
 require_once('plist_parser.php');
+require_once('javascript_packer.php');
 
 ?>
