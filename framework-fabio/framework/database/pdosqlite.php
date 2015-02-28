@@ -27,7 +27,7 @@
 	)
  */
 
-class JDatabasePDOSQLLite extends JDatabase
+class JDatabasepdosqlite extends JDatabase
 {
 	/**
 	 * The database driver name
@@ -215,6 +215,7 @@ class JDatabasePDOSQLLite extends JDatabase
 		    // Print PDOException message
 		    $this->_errorNum = 0;
 		    $this->_errorMsg = $e->getMessage();
+			
 			if ($this->_debug) {
 				die('JDatabaseSQLLite::query: '.$this->_errorNum.' - '.$this->_errorMsg );
 			}
