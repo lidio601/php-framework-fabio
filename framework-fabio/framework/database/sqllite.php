@@ -21,7 +21,7 @@ class MyDB extends SQLite3
 {
     function __construct($file)
     {
-        $this->open($file, SQLITE3_OPEN_READWRITE);
+        $this->open($file, SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
     }
 }
 
@@ -40,6 +40,8 @@ class JDatabaseSQLLite extends JDatabase
 	 * @var string
 	 */
 	var $_nullDate		= '0000-00-00 00:00:00';
+	
+	var $filename       = '';
 
 	/**
 	 * Quote for named objects
@@ -69,7 +71,12 @@ class JDatabaseSQLLite extends JDatabase
 			return;
 		}
 		
+		$this->filename = $file;
+		
+		//echo $file;
+		
 		$this->dbo = new myDB($file);
+		//echo $file;
 
 		// connect to the server
 		/*if (!($this->_resource = sqlite_open($file, 0666, $sqliteerror) )) {
@@ -206,7 +213,11 @@ class JDatabaseSQLLite extends JDatabase
 		$this->_errorNum = 0;
 		$this->_errorMsg = '';
 		//$this->_cursor = sqlite_query( $sql, $this->_resource );
-		$this->_cursor = $this->dbo->query($sql);
+		if( strpos(' '.$sql,'SELECT ')!=false ) {
+			$this->_cursor = $this->dbo->query($sql);
+		} else {
+			$this->_cursor = $this->dbo->exec($sql);
+		}
 
 		if (!$this->_cursor)
 		{
