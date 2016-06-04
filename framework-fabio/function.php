@@ -42,7 +42,10 @@ function isValidMd5($md5)
  *	@param default	valore sostituitivo da assegnare alla variabile in uscita
  */
 function varGET($name,$default='') {
-	return isset($_REQUEST[$name])&&strlen(strval($_REQUEST[$name])) ? $_REQUEST[$name] : $default;
+	$value = isset($_REQUEST[$name])&&strlen(strval($_REQUEST[$name])) ? $_REQUEST[$name] : $default;
+	$value = filter_var($value, FILTER_SANITIZE_STRING|FILTER_SANITIZE_STRIPPED);
+	$value = trim($value);
+	return $value;
 }
 
 /*
